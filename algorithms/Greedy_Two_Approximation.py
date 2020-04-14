@@ -1,4 +1,4 @@
-from knapsack import Knapsack
+from knapsack.knapsack import Knapsack
 
 # creating array to hold knapsack instances and value totals
 knapsack_instances = []
@@ -12,7 +12,7 @@ for x in range(1000):
     cx.greedy_sort_items()
     knapsack_instances.append(cx)
 
-# running algorithm on all 100 instances of knapsack
+# running algorithm on all 1000 instances of knapsack
 for j in knapsack_instances:
     taken = []
     left = j.capacity

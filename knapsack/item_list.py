@@ -1,8 +1,3 @@
-from random import seed
-from random import randint
-from item import Item
-
-
 class ItemList:
     def __init__(self, ):
         self.value = v

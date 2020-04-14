@@ -1,6 +1,5 @@
-from random import seed
 from random import randint
-from item import Item
+from knapsack.item import Item
 
 
 class Knapsack:
