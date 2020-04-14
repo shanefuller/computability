@@ -21,7 +21,9 @@ Knapsack algorithms above on these instances.
 MAX3SAT on these instances.
 
 Include in your emailed submission:
+
 • your code as a zipped attachment, written in the language of your choice.
+
 • a report (as a pdf) that provides details of your experiments including the average, median, minimum
 and maximum quality of the solutions returned for Maximum Knapsack and 3SAT as well as the
 average, median, minimum, and maximum running times for both the Maximum Knapsack instances
