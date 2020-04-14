@@ -1,45 +1,66 @@
 from knapsack import Knapsack
 
+# creating array to hold knapsack instances and value totals
 knapsack_instances = []
-knap = Knapsack()
-knap.add_items()
+totals = []
+capacity_total = 0
 
-knapSort = sorted(knap.items, key=lambda item: item.value/item.weight, reverse=True)
-knap.add_sort_items(knapSort)
+# filling array with 1000 knapsack instances
+for x in range(1000):
+    cx = Knapsack()
+    cx.add_items()
+    cx.greedy_sort_items()
+    knapsack_instances.append(cx)
 
-taken = []
-left = knap.capacity
-sums = 0
+# running algorithm on all 100 instances of knapsack
+for j in knapsack_instances:
+    taken = []
+    left = j.capacity
+    total = 0
 
-print(str(knap))
-print("Taken: " + str(taken))
-print("L: " + str(left))
-print("Sum: " + str(sums))
+    print(str(j))
+    print("Taken: " + str(taken))
+    print("L: " + str(left))
+    print("Total Value: " + str(total))
 
-for a in knap.items:
-    if left > 0:
-        if a.weight <= left:
-            taken.append(a)
-            left = left-a.weight
-            sums = sums+a.value
+    for a in j.items:
+        if left > 0:
+            if a.weight <= left:
+                taken.append(a)
+                left = left-a.weight
+                total = total+a.value
+            else:
+                print(str(a.weight) + " is greater than " + str(left))
         else:
-            print(str(a.weight) + " is greater than " + str(left))
-    else:
-        print(str(left) + " is less than 0")
+            print(str(left) + " is less than 0")
+
+    print(str(j))
+    print("Taken: " + str(taken))
+    print("L: " + str(left))
+    print("Total Value: " + str(total))
+    totals.append(total)
+    capacity_total = capacity_total+j.capacity
+    print("\n\n\n**********************")
 
 
-print("Taken: " + str(taken))
-print("L: " + str(left))
-print("Sum: " + str(sums))
+# finding median
+totals.sort()
+if len(totals) % 2 == 0:
+    median1 = totals[len(totals)//2]
+    median2 = totals[len(totals)//2 - 1]
+    median = (median1 + median2)/2
+else:
+    median = totals[len(totals)//2]
 
-
-
-# for x in range(100):
-#     cx = Knapsack()
-#     cx.add_items()
-#     knapsack_instances.append(cx)
-
-# for t in knapsack_instances:
-#     print(str(t))
+# printing out totals for efficacy in maximizing value
+print("\n\n\n**********************")
+print("Totals: " + str(totals))
+print("Average: " + str(sum(totals)/len(totals)))
+print("Minimum: " + str(min(totals)))
+print("Median: " + str(median))
+print("Maximum: " + str(max(totals)))
+print("Sum of Totals: " + str(sum(totals)))
+print("Sum of Capacity: " + str(capacity_total))
+print("Average to Capacity: " + str(sum(totals)/capacity_total))
 
 

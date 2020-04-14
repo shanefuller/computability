@@ -1,7 +1,3 @@
-from random import seed
-from random import randint
-
-
 class Item:
     def __init__(self, v, w):
         self.value = v
