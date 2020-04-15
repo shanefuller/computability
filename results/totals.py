@@ -1,4 +1,4 @@
-class Efficacy:
+class Totals:
     def __init__(self, e):
         self.eff = e
         self.average = (sum(e) / len(e))
