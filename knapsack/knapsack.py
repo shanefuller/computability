@@ -1,5 +1,6 @@
 from random import randint
 from knapsack.item import Item
+import random
 
 
 class Knapsack:
@@ -16,5 +17,11 @@ class Knapsack:
     def greedy_sort_items(self):
         self.items = sorted(self.items, key=lambda item: item.value / item.weight, reverse=True)
 
+    def unsort_items(self):
+        random.shuffle(self.items)
+
     def __str__(self):
+        return "Capacity: {}, Items: {}".format(self.capacity, self.items)
+
+    def __repr__(self):
         return "Capacity: {}, Items: {}".format(self.capacity, self.items)
