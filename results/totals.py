@@ -12,6 +12,7 @@ class Totals:
         print("Minimum: " + str(self.minimum))
         print("Median: " + str(self.median))
         print("Maximum: " + str(self.maximum))
+        return " "
 
     # finding median
     def set_median(self):

@@ -73,8 +73,12 @@ def min_cost(knapsack_instances):
 
         # create variables for what is taken, and sum of values taken
         taken = []
-        left = j.capacity
         total = 0
+        min_cost = []
+        a_max = j.max_value()
+
+        for i in j.items:
+            min_cost[i,0] = 0
 
         # print introduction to algorithm
         # print("BEFORE GREEDY TWO APPROXIMATION ALGORITHM RUN")
@@ -82,7 +86,7 @@ def min_cost(knapsack_instances):
         # print("Taken: " + str(taken))
         # print("L: " + str(left))
 
-        # start greedy two approximation algorithm
+        # start min cost algorithm
         for a in j.items:
             if left > 0:
                 if a.weight <= left:
@@ -124,6 +128,9 @@ def greedy_two_approximation(knapsack_instances):
 
         # start timer for individual run
         start = time.time()
+
+        # sort items in knapsack
+        j.greedy_sort_items()
 
         # create variables for what is taken, and sum of values taken
         taken = []
@@ -175,6 +182,9 @@ def fptas(knapsack_instances):
 
     # running algorithm on all 1000 instances of knapsack
     for j in knapsack_instances:
+
+        # unsort items from greedy two approximation
+        j.unsort_items()
 
         # start timer for individual run
         start = time.time()
@@ -230,7 +240,6 @@ k_instances = []
 for x in range(1000):
     cx = Knapsack()
     cx.add_items()
-    cx.greedy_sort_items()
     k_instances.append(cx)
 
 # The O(nW) dynamic programming algorithm that we discussed in CS305.
@@ -280,10 +289,10 @@ print("*************************************")
 print(str(greedy_two_approximation_results))
 
 p3_e = Totals(numpy.divide(greedy_two_approximation_results.efficacy.eff,
-                           greedy_two_approximation_results.efficacy.eff))
+                           optimal_dynamic_programming_results.efficacy.eff))
 
 p3_rt = Totals(numpy.divide(greedy_two_approximation_results.running_time.eff,
-                            greedy_two_approximation_results.running_time.eff))
+                            optimal_dynamic_programming_results.running_time.eff))
 
 print("\nQuality of Solutions")
 print("*************************************")
@@ -300,10 +309,10 @@ print("*************************************")
 print(str(fptas_results))
 
 p4_e = Totals(numpy.divide(fptas_results.efficacy.eff,
-                           fptas_results.efficacy.eff))
+                           optimal_dynamic_programming_results.efficacy.eff))
 
 p4_rt = Totals(numpy.divide(fptas_results.running_time.eff,
-                            fptas_results.running_time.eff))
+                            optimal_dynamic_programming_results.running_time.eff))
 
 print("\nQuality of Solutions")
 print("*************************************")

@@ -7,10 +7,12 @@ class Results:
         print("\n\nEFFICACY VALUES")
         print("*********************")
         print(self.totals.print_results())
-        print("\n")
         print("RUNNING TIME VALUES")
         print("*******************")
         print(self.totals.print_results())
 
     def __str__(self):
+        return "Efficacy: {}\nRunning Time: {}".format(self.efficacy, self.running_time)
+
+    def __repr__(self):
         return "Efficacy: {}\nRunning Time: {}".format(self.efficacy, self.running_time)

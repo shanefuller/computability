@@ -20,6 +20,15 @@ class Knapsack:
     def unsort_items(self):
         random.shuffle(self.items)
 
+    def max_value(self):
+        mx = 0
+        for t in self.items:
+            if t.value >= mx:
+                mx = t.value
+            else:
+                pass
+        return mx
+
     def __str__(self):
         return "Capacity: {}, Items: {}".format(self.capacity, self.items)
 
