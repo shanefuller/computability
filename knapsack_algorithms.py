@@ -22,8 +22,6 @@ def run_optimal_dynamic_programming(knapsack_instances):
         # arr = [[0 for i in range(cols)] for j in range(rows)]
         # print(arr)
 
-
-
         # add totals and running times to arrays
         totals.append(1)
         running_times.append((1 - start))

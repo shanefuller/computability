@@ -1,3 +1,4 @@
+import math
 from random import randint
 from knapsack.item import Item
 import random
@@ -28,6 +29,13 @@ class Knapsack:
             else:
                 pass
         return mx
+
+    def fptas_scaling(self, max, epsilon):
+        for q in self.items:
+            q.value = q.value/max
+            q.value = q.value*len(self.items)
+            q.value = q.value/epsilon
+            q.value = math.floor(q.value)
 
     def __str__(self):
         return "Capacity: {}, Items: {}".format(self.capacity, self.items)
