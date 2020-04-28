@@ -10,8 +10,7 @@ of the problem.
 4. The FPTAS based on scaling with the optimal dynamic programming algorithm from (2) above.
 5. The DPLL algorithm.
 6. GSAT
-7. The simple randomized 7
-8. approximation algorithm for MAX3SAT.
+7. The simple randomized 7/8 approximation algorithm for MAX3SAT.
 
 After implementing the algorithms, run the following experiments:
 
