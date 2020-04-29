@@ -1,3 +1,6 @@
+import random
+
+
 class Totals:
     def __init__(self, e):
         self.eff = e
@@ -16,13 +19,14 @@ class Totals:
 
     # finding median
     def set_median(self):
-        self.eff.sort()
-        if len(self.eff) % 2 == 0:
-            median1 = self.eff[len(self.eff) // 2]
-            median2 = self.eff[len(self.eff) // 2 - 1]
+        copy = self.eff[:]
+        copy.sort()
+        if len(copy) % 2 == 0:
+            median1 = copy[len(copy) // 2]
+            median2 = copy[len(copy) // 2 - 1]
             self.median = (median1 + median2) / 2
         else:
-            self.median = self.eff[len(self.eff) // 2]
+            self.median = copy[len(copy) // 2]
 
     def __str__(self):
         return "{}".format(self.eff)

@@ -7,9 +7,10 @@ import random
 class Knapsack:
     def __init__(self):
         self.capacity = randint(3000, 4000)
-        self.target = randint(3000, 4000)
+        # self.capacity = randint(25, 100)
         self.items = []
 
+        # for x in range(3):
         for x in range(500):
             val = randint(1, 50)
             wei = randint(1, 50)
