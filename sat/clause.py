@@ -8,8 +8,27 @@ class Clause:
     def clause_length(self):
         return len(self.clause)
 
+    def create_unit_clause(self, unit):
+        self.clause.pop(0)
+        self.clause.pop(0)
+        self.clause[0] = unit
+
     def __str__(self):
-        return "[{} V {} V {}]".format(self.clause[0], self.clause[1], self.clause[2])
+        result = "["
+        for t in range(len(self.clause) + 1):
+            if t < len(self.clause) - 1:
+                result = result + str(self.clause[t]) + " V "
+            elif t == len(self.clause) - 1:
+                result = result + str(self.clause[t]) + "]"
+
+        return result
 
     def __repr__(self):
-        return "[{} V {} V {}]".format(self.clause[0], self.clause[1], self.clause[2])
+        result = "["
+        for t in range(len(self.clause)+1):
+            if t < len(self.clause)-1:
+                result = result + str(self.clause[t]) + " V "
+            elif t == len(self.clause)-1:
+                result = result + str(self.clause[t]) + "]"
+
+        return result

@@ -8,40 +8,50 @@ from sat.gsat import Gsat
 from sat.sat import Sat
 
 
-def unit_propagation(sat_instance):
-    print(sat_instance)
-    print(sat_instance.truth_assignment)
+def unit_propagation(formula, truth_assignment_so_far):
 
-    w = sat_instance.clauses[0]
+    # setting initial values for loop and index
+    w = formula[0]
     index = 1
 
-    while w in sat_instance.clauses:
+    while w in formula:
+
+        # if the clause is a unit clause
         if w.clause_length() == 1:
+
+            # identify if positive or negative literal
             if w.clause[0] <= 100:
                 positive_literal = True
             else:
                 positive_literal = False
 
+            # assign truth to assignment so far, identify negation for removing from clauses
             if positive_literal:
-                sat_instance.truth_assignment[(w.clause[0] - 1)] = True
+                truth_assignment_so_far[(w.clause[0] - 1)] = True
                 positive_version = w.clause[0]
                 negative_version = w.clause[0] + 100
             else:
-                sat_instance.truth_assignment[(w.clause[0] - 101)] = False
+                truth_assignment_so_far[(w.clause[0] - 101)] = False
                 negative_version = w.clause[0]
                 positive_version = w.clause[0] - 100
 
-            for p in sat_instance.clauses:
+            # remove unit clause and negation from current iteration of clauses
+            for p in formula:
                 if positive_version in p or negative_version in p:
-                    sat_instance.clauses.remove(p)
+                    formula.remove(p)
 
-            w = sat_instance.clauses[0]
+            # return back to first clause and restart process of looking for unit clauses
+            w = formula[0]
 
+        # if not a unit clause, set to next clause, check and see if more clauses to go to
         else:
-            w = sat_instance.clauses[index]
+            w = formula[index]
             index += 1
-            if index > len(sat_instance.clauses)-1:
+            if index > len(formula)-1:
                 break
+
+    # returning the remaining formula and truth assignment
+    return formula, truth_assignment_so_far
 
 
 
@@ -51,24 +61,64 @@ def dpll(sat_instances):
 
     # running algorithm on all 1000 instances of sat
     for j in sat_instances:
-        # reset truth values
-        j.reset_truth_values()
 
         # start timer for individual run
         start = time.time()
 
         # add random truth assignments
-        j.add_random_truth()
+        j.add_empty_truth()
 
-        # assign truth values within a single clause
-        j.clause_value()
+        # begin dpll by calling unit prop
+        new_formula, new_assignment = unit_propagation(j.clauses[:], j.truth_assignment[:])
 
-        # end timer for individual run
-        end = time.time()
+        print(new_formula)
+        print(new_assignment)
 
-        # add totals and running times to arrays
-        totals.append(j.count_satisfied())
-        running_times.append((end - start))
+        # satisfiable instance
+        if len(new_formula) == 0:
+
+            # end timer for individual run
+            end = time.time()
+
+            # add totals and running times to arrays
+            totals.append(300)
+            running_times.append((end - start))
+
+            # go to next sat instance
+            continue
+
+        # # unsatisfiable instance
+        # if len(new_formula) > 0:
+        #
+        #     # end timer for individual run
+        #     end = time.time()
+        #
+        #     # add totals and running times to arrays
+        #     totals.append(1)
+        #     running_times.append((end - start))
+        #
+        #     # go to next sat instance
+        #     continue
+
+        # find first variable unassigned in new_assignment
+        first_unassigned = 0
+        for q in range(len(new_assignment)):
+            if new_assignment[q] is None:
+                first_unassigned = q + 1
+                break
+
+        # create unit clause and add to formula
+        unit_clause = Clause()
+        unit_clause.create_unit_clause(first_unassigned)
+        new_formula.insert(0, unit_clause)
+
+        # add to truth assignment
+        new_assignment[first_unassigned] = True
+
+        # recursively run dpll
+        result = run_dpll(new_formula, new_assignment)
+
+        if result
 
     # return arrays of all efficacy and corresponding running times
     return Results(Totals(totals), Totals(running_times))
@@ -80,9 +130,6 @@ def gsat(sat_instances):
 
     # running algorithm on all 1000 instances of knapsack
     for j in sat_instances:
-
-        # reset truth values
-        j.reset_truth_values()
 
         # start timer for individual run
         start = time.time()
@@ -135,10 +182,8 @@ def randomized_maxsat(sat_instances):
     totals = []
     running_times = []
 
-    # running algorithm on all 1000 instances of knapsack
+    # running algorithm on all instances of sat
     for j in sat_instances:
-        # reset truth values
-        j.reset_truth_values()
 
         # start timer for individual run
         start = time.time()
@@ -164,34 +209,33 @@ def randomized_maxsat(sat_instances):
 sat_instances = []
 
 # filling array with 1000 sat instances
-for x in range(20):
+for x in range(1):
     cx = Sat()
     sat_instances.append(cx)
 
-sat_in = Sat()
-sat_in.add_empty_truth()
-unit_propagation(sat_in)
-
-print(sat_in.truth_assignment)
-
 # The DPLL algorithm.
-# dpll_results = dpll(sat_instances)
-# print("DPLL ALGORITHM")
-# print("*************************************")
-# print(str(dpll_results))
-#
-# p5_e = Totals(dpll_results.efficacy.eff)
+dpll_results = dpll(sat_instances)
+print("DPLL ALGORITHM")
+print("*************************************")
+print(str(dpll_results))
+
+# p5_e = Totals(numpy.divide(dpll_results.efficacy.eff,
+#                            dpll_results.efficacy.eff))
 #
 # p5_rt = Totals(numpy.divide(dpll_results.running_time.eff,
 #                             dpll_results.running_time.eff))
-#
-# print("\nQuality of Solutions")
-# print("*************************************")
-# print(p5_e.print_results())
-#
-# print("\nQuality of Running Time")
-# print("*************************************")
-# print(p5_rt.print_results())
+
+p5_e = Totals(dpll_results.efficacy.eff)
+
+p5_rt = Totals(dpll_results.running_time.eff)
+
+print("\nQuality of Solutions")
+print("*************************************")
+print(p5_e.print_results())
+
+print("\nQuality of Running Time")
+print("*************************************")
+print(p5_rt.print_results())
 
 
 # GSAT
