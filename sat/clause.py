@@ -17,6 +17,11 @@ class Clause:
         self.clause.pop(0)
         self.clause[0] = unit
 
+    # def remove_from_clause(self, value):
+    #     for t in self.clause:
+    #         if self.clause[t] == value:
+
+
     def find_value(self, val):
         if val in self.clause:
             return True

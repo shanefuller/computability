@@ -13,6 +13,8 @@ def unit_propagation(formula, truth_assignment_so_far):
     w = formula[0]
     index = 1
 
+    # find unit clause
+
     while w in formula:
 
         # if the clause is a unit clause
@@ -71,7 +73,7 @@ def unit_propagation(formula, truth_assignment_so_far):
                 print(index)
                 index += 1
                 print(index)
-                if(index+count) >= len(formula)-1:
+                if index >= len(formula)-1:
                     break
 
             # return back to first clause and restart process of looking for unit clauses
@@ -144,7 +146,7 @@ def run_dpll(formula_so_far, truth_so_far):
     print(new_formula)
 
     # recursively run dpll
-    result = run_dpll(new_formula, new_assignment)
+    result = run_dpll(new_formula[:], new_assignment[:])
 
     if result:
         return True
@@ -158,7 +160,7 @@ def run_dpll(formula_so_far, truth_so_far):
         new_assignment[first_unassigned_literal - 1] = False
         new_assignment[first_unassigned_literal + 99] = True
 
-        return run_dpll(new_formula, new_assignment)
+        return run_dpll(new_formula[:], new_assignment[:])
 
 
 def dpll(sat_instances):

@@ -16,14 +16,14 @@ def optimal_dynamic_programming(knapsack_instances):
         start = time.time()
 
         # create array to store values, initialize to 0
-        arr = numpy.empty((len(j.items) + 1, j.capacity))
+        arr = numpy.empty((len(j.items) + 1, j.capacity + 1))
 
         # set value of taking items with no capacity to 0
         for b in range((len(j.items) + 1)):
             arr[b][0] = 0
 
         # set value of no more items left equal to 0
-        for v in range(j.capacity):
+        for v in range(j.capacity + 1):
             arr[(len(j.items))][v] = 0
 
         # initialize value for loop
@@ -31,7 +31,7 @@ def optimal_dynamic_programming(knapsack_instances):
 
         # begin dynamic programming algorithm from CS305
         for w in range(val, -1, -1):
-            for z in range(j.capacity):
+            for z in range(j.capacity + 1):
                 if j.items[w].weight <= z:
                     arr[w, z] = max(arr[(w + 1)][(z - j.items[w].weight)]+j.items[w].value, arr[(w + 1)][z])
                 else:
@@ -41,7 +41,7 @@ def optimal_dynamic_programming(knapsack_instances):
         end = time.time()
 
         # add totals and running times to arrays
-        totals.append(arr[0, j.capacity - 1])
+        totals.append(arr[0, j.capacity])
         running_times.append((end - start))
 
     # return arrays of all efficacy and corresponding running times
@@ -77,7 +77,7 @@ def min_cost(knapsack_instances):
 
         # begin dynamic programming algorithm from CS305
         for w in range(val, -1, -1):
-            for z in range(j.capacity):
+            for z in range(j.capacity)+1:
                 if j.items[w].weight <= z:
                     min_arr[w, z] = max(min_arr[(w + 1)][(z - j.items[w].weight)] + j.items[w].value, min_arr[(w + 1)][z])
                 else:
@@ -87,7 +87,7 @@ def min_cost(knapsack_instances):
         end = time.time()
 
         # add totals and running times to arrays
-        totals.append(min_arr[0, j.capacity - 1])
+        totals.append(min_arr[0, j.capacity])
         running_times.append((end - start))
 
     # return arrays of all efficacy and corresponding running times
