@@ -9,7 +9,6 @@ from sat.sat import Sat
 
 
 def unit_propagation(formula, truth_assignment_so_far):
-
     # setting initial values for loop and index
     w = formula[0]
     index = 1
@@ -35,10 +34,45 @@ def unit_propagation(formula, truth_assignment_so_far):
                 negative_version = w.clause[0]
                 positive_version = w.clause[0] - 100
 
+            previous_remove = False
+            index = 0
+            print("Range: " + str(range(len(formula))))
+            count = 0
+
             # remove unit clause and negation from current iteration of clauses
-            for p in formula:
-                if positive_version in p or negative_version in p:
-                    formula.remove(p)
+            for index in range(len(formula)):
+                if previous_remove:
+                    index -= 1
+
+                print("Removed: " + str(count))
+                print(str(index) + ": " + str(formula[index]))
+                print(positive_version)
+                print(negative_version)
+
+                print(formula[index].find_value(positive_version))
+                print(formula[index].find_value(negative_version))
+
+                if formula[index].find_value(positive_version):
+                    formula.remove(formula[index])
+                    previous_remove = True
+                    count += 1
+                elif formula[index].find_value(negative_version):
+                    formula.remove(formula[index])
+                    previous_remove = True
+                    count += 1
+                else:
+                    previous_remove = False
+
+                print("**********************")
+                print(formula)
+                print(previous_remove)
+                print("here")
+                print("**********************")
+                print(index)
+                index += 1
+                print(index)
+                if(index+count) >= len(formula)-1:
+                    break
 
             # return back to first clause and restart process of looking for unit clauses
             w = formula[0]
@@ -47,12 +81,84 @@ def unit_propagation(formula, truth_assignment_so_far):
         else:
             w = formula[index]
             index += 1
-            if index > len(formula)-1:
+            if index > len(formula) - 1:
                 break
 
     # returning the remaining formula and truth assignment
     return formula, truth_assignment_so_far
 
+
+def run_dpll(formula_so_far, truth_so_far):
+    # begin dpll by calling unit prop
+    new_formula, new_assignment = unit_propagation(formula_so_far[:], truth_so_far[:])
+
+    print(new_formula)
+    print(new_assignment)
+
+    # satisfiable instance
+    if len(new_formula) == 0:
+        # end timer for individual run
+        end = time.time()
+
+        # go to next sat instance
+        return True
+
+    # # unsatisfiable instance
+    # if len(new_formula) > 0:
+    #
+    #     # end timer for individual run
+    #     end = time.time()
+    #
+    #     # add totals and running times to arrays
+    #     totals.append(1)
+    #     running_times.append((end - start))
+    #
+    #     # go to next sat instance
+    #     return False
+
+    # find first variable unassigned in new_assignment
+    first_unassigned_literal = 0
+    for q in range(len(new_assignment)):
+        if new_assignment[q] is None:
+            first_unassigned_literal = q + 1
+            break
+
+    # create unit clause and add to formula
+    unit_clause = Clause()
+    unit_clause.create_unit_clause(first_unassigned_literal)
+    new_formula.insert(0, unit_clause)
+
+    # add to truth assignment
+    new_assignment[first_unassigned_literal - 1] = True
+    new_assignment[first_unassigned_literal + 99] = False
+
+    # # add to truth assignment
+    # if first_unassigned_literal <= 100:
+    #     new_assignment[first_unassigned_literal-1] = True
+    #     new_assignment[first_unassigned_literal+99] = False
+    # else:
+    #     new_assignment[first_unassigned_literal-1] = False
+    #     new_assignment[first_unassigned_literal-101] = True
+
+    print(new_assignment)
+    print(new_formula)
+
+    # recursively run dpll
+    result = run_dpll(new_formula, new_assignment)
+
+    if result:
+        return True
+    else:
+        # create unit clause and add to formula
+        unit_clause = Clause()
+        unit_clause.create_unit_clause(first_unassigned_literal + 100)
+        new_formula.insert(0, unit_clause)
+
+        # add to truth assignment
+        new_assignment[first_unassigned_literal - 1] = False
+        new_assignment[first_unassigned_literal + 99] = True
+
+        return run_dpll(new_formula, new_assignment)
 
 
 def dpll(sat_instances):
@@ -68,57 +174,20 @@ def dpll(sat_instances):
         # add random truth assignments
         j.add_empty_truth()
 
-        # begin dpll by calling unit prop
-        new_formula, new_assignment = unit_propagation(j.clauses[:], j.truth_assignment[:])
+        # begin dpll algorithm
+        result = run_dpll(j.clauses, j.truth_assignment)
 
-        print(new_formula)
-        print(new_assignment)
-
-        # satisfiable instance
-        if len(new_formula) == 0:
-
-            # end timer for individual run
-            end = time.time()
-
-            # add totals and running times to arrays
+        # add totals to array
+        if result:
             totals.append(300)
-            running_times.append((end - start))
+        else:
+            totals.append(1)
 
-            # go to next sat instance
-            continue
+        # end timer for individual run
+        end = time.time()
 
-        # # unsatisfiable instance
-        # if len(new_formula) > 0:
-        #
-        #     # end timer for individual run
-        #     end = time.time()
-        #
-        #     # add totals and running times to arrays
-        #     totals.append(1)
-        #     running_times.append((end - start))
-        #
-        #     # go to next sat instance
-        #     continue
-
-        # find first variable unassigned in new_assignment
-        first_unassigned = 0
-        for q in range(len(new_assignment)):
-            if new_assignment[q] is None:
-                first_unassigned = q + 1
-                break
-
-        # create unit clause and add to formula
-        unit_clause = Clause()
-        unit_clause.create_unit_clause(first_unassigned)
-        new_formula.insert(0, unit_clause)
-
-        # add to truth assignment
-        new_assignment[first_unassigned] = True
-
-        # recursively run dpll
-        result = run_dpll(new_formula, new_assignment)
-
-        if result
+        # add running time to array
+        running_times.append((end - start))
 
     # return arrays of all efficacy and corresponding running times
     return Results(Totals(totals), Totals(running_times))
@@ -184,7 +253,6 @@ def randomized_maxsat(sat_instances):
 
     # running algorithm on all instances of sat
     for j in sat_instances:
-
         # start timer for individual run
         start = time.time()
 
@@ -236,7 +304,6 @@ print(p5_e.print_results())
 print("\nQuality of Running Time")
 print("*************************************")
 print(p5_rt.print_results())
-
 
 # GSAT
 # gsat_results = gsat(sat_instances)
