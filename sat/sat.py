@@ -18,6 +18,9 @@ class Sat:
         #for x in range(6):
             self.truth_assignment.append(random.choice([True, False]))
 
+    def add_empty_truth(self):
+        self.truth_assignment = [None] * len(self.clauses)
+
     def clause_value(self):
         self.truth_values = []
         for x in self.clauses:

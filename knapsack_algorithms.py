@@ -70,7 +70,7 @@ def min_cost(knapsack_instances):
 
         # set value of no more items left equal to 0
         for v in range(j.capacity):
-            arr[(len(j.items))][v] = 0
+            min_arr[(len(j.items))][v] = 0
 
         # initialize value for loop
         val = (len(j.items) - 1)
@@ -79,15 +79,15 @@ def min_cost(knapsack_instances):
         for w in range(val, -1, -1):
             for z in range(j.capacity):
                 if j.items[w].weight <= z:
-                    arr[w, z] = max(arr[(w + 1)][(z - j.items[w].weight)] + j.items[w].value, arr[(w + 1)][z])
+                    min_arr[w, z] = max(min_arr[(w + 1)][(z - j.items[w].weight)] + j.items[w].value, min_arr[(w + 1)][z])
                 else:
-                    arr[w, z] = arr[(w + 1)][z]
+                    min_arr[w, z] = min_arr[(w + 1)][z]
 
         # end timer for individual run
         end = time.time()
 
         # add totals and running times to arrays
-        totals.append(arr[0, j.capacity - 1])
+        totals.append(min_arr[0, j.capacity - 1])
         running_times.append((end - start))
 
     # return arrays of all efficacy and corresponding running times

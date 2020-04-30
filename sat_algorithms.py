@@ -8,6 +8,43 @@ from sat.gsat import Gsat
 from sat.sat import Sat
 
 
+def unit_propagation(sat_instance):
+    print(sat_instance)
+    print(sat_instance.truth_assignment)
+
+    w = sat_instance.clauses[0]
+    index = 1
+
+    while w in sat_instance.clauses:
+        if w.clause_length() == 1:
+            if w.clause[0] <= 100:
+                positive_literal = True
+            else:
+                positive_literal = False
+
+            if positive_literal:
+                sat_instance.truth_assignment[(w.clause[0] - 1)] = True
+                positive_version = w.clause[0]
+                negative_version = w.clause[0] + 100
+            else:
+                sat_instance.truth_assignment[(w.clause[0] - 101)] = False
+                negative_version = w.clause[0]
+                positive_version = w.clause[0] - 100
+
+            for p in sat_instance.clauses:
+                if positive_version in p or negative_version in p:
+                    sat_instance.clauses.remove(p)
+
+            w = sat_instance.clauses[0]
+
+        else:
+            w = sat_instance.clauses[index]
+            index += 1
+            if index > len(sat_instance.clauses)-1:
+                break
+
+
+
 def dpll(sat_instances):
     totals = []
     running_times = []
@@ -51,7 +88,8 @@ def gsat(sat_instances):
         start = time.time()
 
         # set max try variable
-        max_try = 1000
+        # max_try = 100
+        max_try = 10
 
         # add random truth assignments
         j.add_random_truth()
@@ -59,29 +97,16 @@ def gsat(sat_instances):
         # assign truth value for random assignment
         j.clause_value()
 
-        print("here")
-        print(j.truth_assignment)
-        print(j.truth_values)
-        print("unsat:" + str(j.count_unsatisfied()))
-
         # start gsat loop
         for gs in range(max_try):
             gsat_instances = []
-            index = 0
             for index in range((len(j.truth_assignment))):
                 j.flip_truth_assignment(index)
-                print(j.truth_assignment)
                 j.clause_value()
-                print(j.truth_values)
-                current_iteration = Gsat(index, j.count_unsatisfied(), j.truth_assignment[:])
-                gsat_instances.append(current_iteration)
-                print(current_iteration)
+                gsat_instances.append(Gsat(index, j.count_unsatisfied(), j.truth_assignment[:]))
                 j.flip_truth_assignment(index)
 
                 index += 1
-
-            print("yo")
-            print(gsat_instances)
 
             best = len(j.clauses)
 
@@ -89,8 +114,6 @@ def gsat(sat_instances):
                 if t.unsat <= best:
                     j.truth_assignment = t.current_truth_assignment[:]
                     best = t.unsat
-
-            print("this one: " + str(j.truth_assignment))
 
             max_try += 1
 
@@ -141,9 +164,15 @@ def randomized_maxsat(sat_instances):
 sat_instances = []
 
 # filling array with 1000 sat instances
-for x in range(2):
+for x in range(20):
     cx = Sat()
     sat_instances.append(cx)
+
+sat_in = Sat()
+sat_in.add_empty_truth()
+unit_propagation(sat_in)
+
+print(sat_in.truth_assignment)
 
 # The DPLL algorithm.
 # dpll_results = dpll(sat_instances)
@@ -166,49 +195,49 @@ for x in range(2):
 
 
 # GSAT
-gsat_results = gsat(sat_instances)
-print("\n\nGSAT ALGORITHM")
-print("*************************************")
-print(str(gsat_results))
-
-# p6_e = Totals(numpy.divide(gsat_results.efficacy.eff,
-#                            gsat_results.efficacy.eff))
+# gsat_results = gsat(sat_instances)
+# print("\n\nGSAT ALGORITHM")
+# print("*************************************")
+# print(str(gsat_results))
 #
-# p6_rt = Totals(numpy.divide(gsat_results.running_time.eff,
-#                             gsat_results.running_time.eff))
-
-p6_e = Totals(gsat_results.efficacy.eff)
-
-p6_rt = Totals(gsat_results.running_time.eff)
-
-print("\nQuality of Solutions")
-print("*************************************")
-print(p6_e.print_results())
-
-print("\nQuality of Running Time")
-print("*************************************")
-print(p6_rt.print_results())
-
-# The simple randomized 7/8 approximation algorithm for MAX3SAT.
-randomized_maxsat_results = randomized_maxsat(sat_instances)
-print("\n\nRANDOMIZED MAXSAT ALGORITHM")
-print("*************************************")
-print(str(randomized_maxsat_results))
-
-# p7_e = Totals(numpy.divide(randomized_maxsat_results.efficacy.eff,
-#                            randomized_maxsat_results.efficacy.eff))
+# # p6_e = Totals(numpy.divide(gsat_results.efficacy.eff,
+# #                            gsat_results.efficacy.eff))
+# #
+# # p6_rt = Totals(numpy.divide(gsat_results.running_time.eff,
+# #                             gsat_results.running_time.eff))
 #
-# p7_rt = Totals(numpy.divide(randomized_maxsat_results.running_time.eff,
-#                             randomized_maxsat_results.running_time.eff))
-
-p7_e = Totals(randomized_maxsat_results.efficacy.eff)
-
-p7_rt = Totals(randomized_maxsat_results.running_time.eff)
-
-print("\nQuality of Solutions")
-print("*************************************")
-print(p7_e.print_results())
-
-print("\nQuality of Running Time")
-print("*************************************")
-print(p7_rt.print_results())
+# p6_e = Totals(gsat_results.efficacy.eff)
+#
+# p6_rt = Totals(gsat_results.running_time.eff)
+#
+# print("\nQuality of Solutions")
+# print("*************************************")
+# print(p6_e.print_results())
+#
+# print("\nQuality of Running Time")
+# print("*************************************")
+# print(p6_rt.print_results())
+#
+# # The simple randomized 7/8 approximation algorithm for MAX3SAT.
+# randomized_maxsat_results = randomized_maxsat(sat_instances)
+# print("\n\nRANDOMIZED MAXSAT ALGORITHM")
+# print("*************************************")
+# print(str(randomized_maxsat_results))
+#
+# # p7_e = Totals(numpy.divide(randomized_maxsat_results.efficacy.eff,
+# #                            randomized_maxsat_results.efficacy.eff))
+# #
+# # p7_rt = Totals(numpy.divide(randomized_maxsat_results.running_time.eff,
+# #                             randomized_maxsat_results.running_time.eff))
+#
+# p7_e = Totals(randomized_maxsat_results.efficacy.eff)
+#
+# p7_rt = Totals(randomized_maxsat_results.running_time.eff)
+#
+# print("\nQuality of Solutions")
+# print("*************************************")
+# print(p7_e.print_results())
+#
+# print("\nQuality of Running Time")
+# print("*************************************")
+# print(p7_rt.print_results())
