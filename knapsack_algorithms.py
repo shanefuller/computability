@@ -127,8 +127,6 @@ def greedy_two_approximation(knapsack_instances):
         left = j.capacity
         total = 0
 
-        print(j)
-
         # start greedy two approximation algorithm
         for a in sorted_items:
             if left > 0:
@@ -166,12 +164,8 @@ def fptas(knapsack_instances):
         a_max = j.max_value()
         epsilon = 0.1
 
-        print(j)
-
         # fptas scaling
         j.fptas_scaling(a_max, epsilon)
-
-        print(j)
 
         # create array to store values, initialize to infinity and false
         inf = float("inf")
@@ -187,14 +181,11 @@ def fptas(knapsack_instances):
             min_arr[0][t+1] = j.items[0].weight
             take[0][t] = True
 
-        # fill in first row whn not taking item
+        # fill in first row when not taking item
         next_value = j.items[0].value + 1
         for t in range(next_value, len(min_arr)):
             min_arr[0][t + 1] = inf
             take[0][t] = False
-
-        print(min_arr)
-        print(take)
 
         # begin min cost dynamic programming algorithm
         for i in range(2, len(j.items)):
