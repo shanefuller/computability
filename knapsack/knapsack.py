@@ -17,7 +17,7 @@ class Knapsack:
             self.items.append(Item(val, wei))
 
     def greedy_sort_items(self):
-        self.items = sorted(self.items, key=lambda item: item.value / item.weight, reverse=True)
+        return sorted(self.items, key=lambda item: item.value / item.weight, reverse=True)
 
     def unsort_items(self):
         random.shuffle(self.items)

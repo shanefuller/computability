@@ -61,33 +61,48 @@ def min_cost(knapsack_instances):
         # create variables
         a_max = j.max_value()
 
-        # create array to store values, initialize to 0
-        min_arr = numpy.empty((len(j.items), (len(j.items)*a_max)))
+        # create array to store values, initialize to infinity and false
+        inf = float("inf")
+        min_arr = numpy.full((len(j.items), (len(j.items)*a_max)), inf)
+        take = numpy.empty((len(j.items), (len(j.items)*a_max)), dtype=bool)
 
         # set value of taking items with no capacity to 0
         for b in range((len(j.items))):
             min_arr[b][0] = 0
 
-        # set value of no more items left equal to 0
-        for v in range(j.capacity):
-            min_arr[(len(j.items))][v] = 0
+        # fill in first row when taking item
+        for t in range(j.items[0].value):
+            min_arr[0][t+1] = j.items[0].weight
+            take[0][t] = True
 
-        # initialize value for loop
-        val = (len(j.items) - 1)
+        # fill in first row whn not taking item
+        next_value = j.items[0].value + 1
+        for t in range(next_value, len(min_arr)):
+            min_arr[0][t + 1] = inf
+            take[0][t] = False
 
-        # begin dynamic programming algorithm from CS305
-        for w in range(val, -1, -1):
-            for z in range(j.capacity)+1:
-                if j.items[w].weight <= z:
-                    min_arr[w, z] = max(min_arr[(w + 1)][(z - j.items[w].weight)] + j.items[w].value, min_arr[(w + 1)][z])
+        print(min_arr)
+        print(take)
+
+        # begin min cost dynamic programming algorithm
+        for i in range(2, len(j.items)):
+            for t in range(1, len(min_arr)):
+                next_t = max(0, t-j.items[i].value)
+                if min_arr[i-i][t] <= min_arr[i-1, next_t] + j.items[i].weight:
+                    min_arr[i][t] = min_arr[i-i][t]
+                    take[i][t] = False
                 else:
-                    min_arr[w, z] = min_arr[(w + 1)][z]
+                    min_arr[i][t] = min_arr[i - i][t] + j.items[i].weight
+                    take[i][t] = True
+
+        # find total from array
+        total = 50
 
         # end timer for individual run
         end = time.time()
 
         # add totals and running times to arrays
-        totals.append(min_arr[0, j.capacity])
+        totals.append(total)
         running_times.append((end - start))
 
     # return arrays of all efficacy and corresponding running times
@@ -105,15 +120,17 @@ def greedy_two_approximation(knapsack_instances):
         start = time.time()
 
         # sort items in knapsack
-        j.greedy_sort_items()
+        sorted_items = j.greedy_sort_items()
 
         # create variables for what is taken, and sum of values taken
         taken = []
         left = j.capacity
         total = 0
 
+        print(j)
+
         # start greedy two approximation algorithm
-        for a in j.items:
+        for a in sorted_items:
             if left > 0:
                 if a.weight <= left:
                     taken.append(a)
@@ -139,31 +156,59 @@ def fptas(knapsack_instances):
     totals = []
     running_times = []
 
-    # running algorithm on all 1000 instances of knapsack
+    # running algorithm on all instances of knapsack
     for j in knapsack_instances:
-
-        # unsort items from greedy two approximation
-        j.unsort_items()
 
         # start timer for individual run
         start = time.time()
 
-        # create variables for what is taken, and sum of values taken
-        taken = []
-        left = j.capacity
-        total = 0
+        # create variables
+        a_max = j.max_value()
+        epsilon = 0.1
 
-        # start greedy two approximation algorithm
-        for a in j.items:
-            if left > 0:
-                if a.weight <= left:
-                    taken.append(a)
-                    left = left - a.weight
-                    total = total + a.value
+        print(j)
+
+        # fptas scaling
+        j.fptas_scaling(a_max, epsilon)
+
+        print(j)
+
+        # create array to store values, initialize to infinity and false
+        inf = float("inf")
+        min_arr = numpy.full((len(j.items), (len(j.items)*a_max)), inf)
+        take = numpy.empty((len(j.items), (len(j.items)*a_max)), dtype=bool)
+
+        # set value of taking items with no capacity to 0
+        for b in range((len(j.items))):
+            min_arr[b][0] = 0
+
+        # fill in first row when taking item
+        for t in range(j.items[0].value):
+            min_arr[0][t+1] = j.items[0].weight
+            take[0][t] = True
+
+        # fill in first row whn not taking item
+        next_value = j.items[0].value + 1
+        for t in range(next_value, len(min_arr)):
+            min_arr[0][t + 1] = inf
+            take[0][t] = False
+
+        print(min_arr)
+        print(take)
+
+        # begin min cost dynamic programming algorithm
+        for i in range(2, len(j.items)):
+            for t in range(1, len(min_arr)):
+                next_t = max(0, t-j.items[i].value)
+                if min_arr[i-i][t] <= min_arr[i-1, next_t] + j.items[i].weight:
+                    min_arr[i][t] = min_arr[i-i][t]
+                    take[i][t] = False
                 else:
-                    pass
-            else:
-                pass
+                    min_arr[i][t] = min_arr[i - i][t] + j.items[i].weight
+                    take[i][t] = True
+
+        # find total from array
+        total = 50
 
         # end timer for individual run
         end = time.time()
@@ -183,52 +228,53 @@ k_instances = []
 for x in range(3):
     cx = Knapsack()
     k_instances.append(cx)
+    print(cx)
 
-# The O(nW) dynamic programming algorithm that we discussed in CS305.
-optimal_dynamic_programming_results = optimal_dynamic_programming(k_instances)
-print("OPTIMAL DYNAMIC PROGRAMMING ALGORITHM")
-print("*************************************")
-print(str(optimal_dynamic_programming_results))
-
-# p1_e = Totals(numpy.divide(optimal_dynamic_programming_results.efficacy.eff,
-# #                            optimal_dynamic_programming_results.efficacy.eff))
-# #
-# # p1_rt = Totals(numpy.divide(optimal_dynamic_programming_results.running_time.eff,
-# #                             optimal_dynamic_programming_results.running_time.eff))
-
-p1_e = Totals(optimal_dynamic_programming_results.efficacy.eff)
-p1_rt = Totals(optimal_dynamic_programming_results.running_time.eff)
-
-print("\nQuality of Solutions")
-print("*************************************")
-print(p1_e.print_results())
-
-print("\nQuality of Running Time")
-print("*************************************")
-print(p1_rt.print_results())
-
-# # The O(n·v(amax)) dynamic programming algorithm from the textbook based on the MinCost version of the problem.
-# min_cost_results = min_cost(k_instances)
-# print("\n\nMIN COST ALGORITHM")
+# # The O(nW) dynamic programming algorithm that we discussed in CS305.
+# optimal_dynamic_programming_results = optimal_dynamic_programming(k_instances)
+# print("OPTIMAL DYNAMIC PROGRAMMING ALGORITHM")
 # print("*************************************")
-# print(str(min_cost_results))
+# print(str(optimal_dynamic_programming_results))
 #
-# # p2_e = Totals(numpy.divide(min_cost_results.efficacy.eff,
-# #                            optimal_dynamic_programming_results.efficacy.eff))
-# #
-# # p2_rt = Totals(numpy.divide(min_cost_results.running_time.eff,
-# #                             optimal_dynamic_programming_results.running_time.eff))
+# # p1_e = Totals(numpy.divide(optimal_dynamic_programming_results.efficacy.eff,
+# # #                            optimal_dynamic_programming_results.efficacy.eff))
+# # #
+# # # p1_rt = Totals(numpy.divide(optimal_dynamic_programming_results.running_time.eff,
+# # #                             optimal_dynamic_programming_results.running_time.eff))
 #
-# p2_e = Totals(min_cost_results.efficacy.eff)
-# p2_rt = Totals(min_cost_results.running_time.eff)
+# p1_e = Totals(optimal_dynamic_programming_results.efficacy.eff)
+# p1_rt = Totals(optimal_dynamic_programming_results.running_time.eff)
 #
 # print("\nQuality of Solutions")
 # print("*************************************")
-# print(p2_e.print_results())
+# print(p1_e.print_results())
 #
 # print("\nQuality of Running Time")
 # print("*************************************")
-# print(p2_rt.print_results())
+# print(p1_rt.print_results())
+
+# The O(n·v(amax)) dynamic programming algorithm from the textbook based on the MinCost version of the problem.
+min_cost_results = min_cost(k_instances)
+print("\n\nMIN COST ALGORITHM")
+print("*************************************")
+print(str(min_cost_results))
+
+# p2_e = Totals(numpy.divide(min_cost_results.efficacy.eff,
+#                            optimal_dynamic_programming_results.efficacy.eff))
+#
+# p2_rt = Totals(numpy.divide(min_cost_results.running_time.eff,
+#                             optimal_dynamic_programming_results.running_time.eff))
+
+p2_e = Totals(min_cost_results.efficacy.eff)
+p2_rt = Totals(min_cost_results.running_time.eff)
+
+print("\nQuality of Solutions")
+print("*************************************")
+print(p2_e.print_results())
+
+print("\nQuality of Running Time")
+print("*************************************")
+print(p2_rt.print_results())
 
 
 
@@ -257,22 +303,25 @@ print(p3_rt.print_results())
 
 
 
-# # The FPTAS based on scaling with the optimal dynamic programming algorithm from (2) above.
-# fptas_results = fptas(k_instances)
-# print("\n\nFPTAS ALGORITHM")
-# print("*************************************")
-# print(str(fptas_results))
-#
+# The FPTAS based on scaling with the optimal dynamic programming algorithm from (2) above.
+fptas_results = fptas(k_instances)
+print("\n\nFPTAS ALGORITHM")
+print("*************************************")
+print(str(fptas_results))
+
 # p4_e = Totals(numpy.divide(fptas_results.efficacy.eff,
 #                            optimal_dynamic_programming_results.efficacy.eff))
 #
 # p4_rt = Totals(numpy.divide(fptas_results.running_time.eff,
 #                             optimal_dynamic_programming_results.running_time.eff))
-#
-# print("\nQuality of Solutions")
-# print("*************************************")
-# print(p4_e.print_results())
-#
-# print("\nQuality of Running Time")
-# print("*************************************")
-# print(p4_rt.print_results())
+
+p4_e = Totals(fptas_results.efficacy.eff)
+p4_rt = Totals(fptas_results.running_time.eff)
+
+print("\nQuality of Solutions")
+print("*************************************")
+print(p4_e.print_results())
+
+print("\nQuality of Running Time")
+print("*************************************")
+print(p4_rt.print_results())
