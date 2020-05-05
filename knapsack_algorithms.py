@@ -61,34 +61,38 @@ def min_cost(knapsack_instances):
         # create variables
         a_max = j.max_value()
 
+        print(a_max)
+        print(len(j.items))
+        print((len(j.items)*a_max))
+
         # create array to store values, initialize to infinity and false
         inf = float("inf")
         min_arr = numpy.full((len(j.items), (len(j.items)*a_max)), inf)
-        take = numpy.empty((len(j.items), (len(j.items)*a_max)), dtype=bool)
+        take = numpy.zeros((len(j.items), (len(j.items)*a_max)), dtype=bool)
 
         # set value of taking items with no capacity to 0
         for b in range((len(j.items))):
             min_arr[b][0] = 0
 
         # fill in first row when taking item
-        for t in range(j.items[0].value):
-            min_arr[0][t+1] = j.items[0].weight
-            take[0][t] = True
+        for t in range(1, j.items[0].value+1):
+            min_arr[0][t] = j.items[0].weight
+            take[0][t-1] = True
 
-        # fill in first row whn not taking item
+        # fill in first row when not taking item
         next_value = j.items[0].value + 1
-        for t in range(next_value, len(min_arr)):
-            min_arr[0][t + 1] = inf
-            take[0][t] = False
+        for t in range(next_value, (len(j.items)*a_max)):
+            min_arr[0][t] = inf
+            take[0][t-1] = False
 
         print(min_arr)
         print(take)
 
         # begin min cost dynamic programming algorithm
-        for i in range(2, len(j.items)):
-            for t in range(1, len(min_arr)):
+        for i in range(1, len(j.items)):
+            for t in range(1, (len(j.items)*a_max)):
                 next_t = max(0, t-j.items[i].value)
-                if min_arr[i-i][t] <= min_arr[i-1, next_t] + j.items[i].weight:
+                if min_arr[i-1][t] <= min_arr[i-1, next_t] + j.items[i].weight:
                     min_arr[i][t] = min_arr[i-i][t]
                     take[i][t] = False
                 else:
@@ -96,7 +100,21 @@ def min_cost(knapsack_instances):
                     take[i][t] = True
 
         # find total from array
-        total = 50
+        total = 0
+
+        for jj in range(len(j.items)*a_max):
+            if min_arr[len(j.items)-1][jj] > j.capacity:
+                break
+            elif min_arr[len(j.items)-1][jj] > total:
+                total = min_arr[len(j.items)-1][jj]
+
+        for wq in range(len(j.items) * a_max):
+            # print(str(wq) + ": " + str(min_arr[len(j.items)-1][wq]))
+            print(str(wq) + ": " + str(min_arr[0][wq]))
+
+        print("#############")
+        print(min_arr)
+        print(take)
 
         # end timer for individual run
         end = time.time()
@@ -167,37 +185,6 @@ def fptas(knapsack_instances):
         # fptas scaling
         j.fptas_scaling(a_max, epsilon)
 
-        # create array to store values, initialize to infinity and false
-        inf = float("inf")
-        min_arr = numpy.full((len(j.items), (len(j.items)*a_max)), inf)
-        take = numpy.empty((len(j.items), (len(j.items)*a_max)), dtype=bool)
-
-        # set value of taking items with no capacity to 0
-        for b in range((len(j.items))):
-            min_arr[b][0] = 0
-
-        # fill in first row when taking item
-        for t in range(j.items[0].value):
-            min_arr[0][t+1] = j.items[0].weight
-            take[0][t] = True
-
-        # fill in first row when not taking item
-        next_value = j.items[0].value + 1
-        for t in range(next_value, len(min_arr)):
-            min_arr[0][t + 1] = inf
-            take[0][t] = False
-
-        # begin min cost dynamic programming algorithm
-        for i in range(2, len(j.items)):
-            for t in range(1, len(min_arr)):
-                next_t = max(0, t-j.items[i].value)
-                if min_arr[i-i][t] <= min_arr[i-1, next_t] + j.items[i].weight:
-                    min_arr[i][t] = min_arr[i-i][t]
-                    take[i][t] = False
-                else:
-                    min_arr[i][t] = min_arr[i - i][t] + j.items[i].weight
-                    take[i][t] = True
-
         # find total from array
         total = 50
 
@@ -216,7 +203,7 @@ def fptas(knapsack_instances):
 k_instances = []
 
 # filling array with 1000 knapsack instances
-for x in range(3):
+for x in range(2):
     cx = Knapsack()
     k_instances.append(cx)
     print(cx)

@@ -11,8 +11,8 @@ class Knapsack:
         self.items = []
 
         # for x in range(3):
-        for x in range(500):
-            val = randint(1, 100)
+        for x in range(3):
+            val = randint(1, 20)
             wei = randint(1, 50)
             self.items.append(Item(val, wei))
 
