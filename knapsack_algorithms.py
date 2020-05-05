@@ -89,14 +89,14 @@ def min_cost(knapsack_instances):
         print(take)
 
         # begin min cost dynamic programming algorithm
-        for i in range(1, len(j.items)):
+        for i in range(2, len(j.items)):
             for t in range(1, (len(j.items)*a_max)):
-                next_t = max(0, t-j.items[i].value)
+                next_t = max(0, t-j.items[i-1].value)
                 if min_arr[i-1][t] <= min_arr[i-1, next_t] + j.items[i].weight:
-                    min_arr[i][t] = min_arr[i-i][t]
+                    min_arr[i][t] = min_arr[i-1][t]
                     take[i][t] = False
                 else:
-                    min_arr[i][t] = min_arr[i - i][t] + j.items[i].weight
+                    min_arr[i][t] = min_arr[i - 1][t] + j.items[i].weight
                     take[i][t] = True
 
         # find total from array
@@ -108,9 +108,9 @@ def min_cost(knapsack_instances):
             elif min_arr[len(j.items)-1][jj] > total:
                 total = min_arr[len(j.items)-1][jj]
 
-        for wq in range(len(j.items) * a_max):
-            # print(str(wq) + ": " + str(min_arr[len(j.items)-1][wq]))
-            print(str(wq) + ": " + str(min_arr[0][wq]))
+        # for wq in range(len(j.items) * a_max):
+        #     # print(str(wq) + ": " + str(min_arr[len(j.items)-1][wq]))
+        #     print(str(wq) + ": " + str(min_arr[0][wq]))
 
         print("#############")
         print(min_arr)
